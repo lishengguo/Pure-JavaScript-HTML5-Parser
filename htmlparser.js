@@ -266,6 +266,67 @@
 		return results;
 	};
 
+	this.HTMLtoJSON = function (html) {
+		var results = "";
+		var level = 0;
+		HTMLParser(html, {
+			level: 0,
+			spar: '',
+			paths:[0],
+			moveLevel: function (step) {
+				this.level += step;
+				var topchar = this.paths[this.paths.length - 1]
+				if(step == 1){
+					if( topchar != 'c' && topchar != 0){
+						this.paths.push('c');
+						results += ',\r\n' + this.spar + '"children":[' ;
+					}else if(topchar != 0){
+						results += ','
+					}
+					this.paths.push(this.level)
+				} else {
+					if(topchar =='c'){ 
+						this.paths.pop();
+						results += ']' ;
+					}
+					this.paths.pop()
+				}
+				this.spar = new Array(this.level + 1).join('\t');
+			},
+			start: function (tag, attrs, unary) {
+				this.moveLevel(1)
+				results += "{"
+				attrs.unshift({
+					name:'component',
+					escaped:tag
+				})
+				for (var i = 0; i < attrs.length; i++){ 
+					results += '\r\n' + this.spar + '"' + attrs[i].name + '":"' + attrs[i].escaped + '"';
+					if(i<attrs.length-1){
+						results += ',';
+					}
+				} 
+				if(unary){
+					this.end(tag);
+				}
+			},
+			end: function (tag) {
+				this.moveLevel(-1)
+				results += '\r\n' + this.spar + '}';
+			},
+			chars: function (text) {  
+				this.moveLevel(1)
+				results += '"' + text + '"'
+				this.moveLevel(-1)
+			},
+			comment: function (text) {
+				//results += "<!--" + text + "-->";
+			}
+		});
+
+		return results;
+	};
+
 	this.HTMLtoDOM = function (html, doc) {
 		// There can be only one of these elements
 		var one = makeMap("html,head,body,title");

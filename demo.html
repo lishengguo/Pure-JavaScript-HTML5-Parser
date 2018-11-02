@@ -26,6 +26,9 @@
 						<input type="submit" value="Run" class="btn btn-primary" />
 					</form>
 					<br />
+					<label>Output (JSON):</label><br />
+					<textarea cols="60" rows="10" id="outputJson" style="width: 100%;"></textarea>
+				
 					<label>Output (XML):</label><br />
 					<textarea cols="60" rows="10" id="output" style="width: 100%;"></textarea>
 				</div>
@@ -60,6 +63,7 @@
 	<script>
 		window.onload = function () {
 			var input = document.getElementById("input");
+			var outputJson = document.getElementById("outputJson");
 			var output = document.getElementById("output");
 			var form = document.getElementById("form");
 
@@ -71,6 +75,7 @@
 				if (typeof event != "undefined") event.returnValue = false;
 
 				output.value = HTMLtoXML(input.value);
+				outputJson.value = HTMLtoJSON(input.value);
 				return false;
 			};
 		};
